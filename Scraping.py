@@ -3,11 +3,21 @@ import random
 import requests
 from game import Game
 from strategy import OpeningStrategy
+import datetime
+
+top_players = []
+top_players_last_updated = datetime.date.today()
 
 # Returns a list of the names of top n players
 def top_n_players(n):
+    global top_players
+    global top_players_last_updated
+    if n == len(top_players) and datetime.date.today() == top_players_last_updated:
+        return top_players
     leaderboard = web.Element(requests.get('http://gokologs.drunkensailor.org/leaderboard/').text)
-    return [person.by_tag('td')[-1].content for person in leaderboard.by_tag('tr')[1:n+1]]
+    top_players = [person.by_tag('td')[-1].content for person in leaderboard.by_tag('tr')[1:n+1]]
+    top_players_last_updated = datetime.date.today()
+    return top_players
 
 # Returns a list of links to most recent max_results logs of games between
 # p1 and p2, or p1 and anyone if p2 is ''
@@ -40,14 +50,14 @@ def random_interesting_game(n, strategy_class):
 	# See if any of the links are interesting
     for link in links:
         game = Game(link, strategy_class)
-        if game.p1_strat != game.p2_strat:
+        if game.p1_strat != game.p2_strat and game.winner != 'Tie':
             found_game = True
             break
 
     # If none are interesting, start over
     if not found_game:
         return random_interesting_game(n, strategy_class)
-
+    
     return game
 
 def game_page(game):
@@ -55,9 +65,14 @@ def game_page(game):
     template = template_file.read()
     template_file.close()
     bane_line = ''
+    if random.choice([True, False]):
+        p1_strat, p2_strat, winner = game.p1_strat, game.p2_strat, 'Player 1'
+    else:
+        p1_strat, p2_strat, winner = game.p2_strat, game.p1_strat, 'Player 2'
+
     if game.bane:
         bane_line = 'Bane: %s' % game.bane
-    return template % (game.kingdom_html, str(game.colonies), str(game.shelters), bane_line, game.p1_strat, game.p2_strat)
+    return template % (game.kingdom_html, str(game.colonies), str(game.shelters), bane_line, p1_strat, p2_strat, winner, game.log_url)
 
 def main():
     game = random_interesting_game(100, OpeningStrategy)

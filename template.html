@@ -9,16 +9,31 @@
 			<br>
 			%s
 			<br>
-			<table>
+			<table style="width:400px">
 				<tr>
-					<td>Strategy 1</td>
-					<td>Strategy 2</td>
+					<td>Player 1</td>
+					<td>Player 2</td>
 				</tr>
 				<tr>
 					<td>%s</td>
 					<td>%s</td>
+				</tr>
+				<tr>
+					<td><button type="button" onclick="document.getElementById('answer').style.display = 'block'">
+						Player 1 has a better strategy
+					</button></td>
+					<td><button type="button" onclick="document.getElementById('answer').style.display = 'block'">
+						Player 2 has a better strategy
+					</button></td>
 				</tr>
 			</table>
+			<div style="display: none;" id="answer">
+				Winner: %s 
+				<br>
+				<a href=%s>Log</a>
+				<br>
+				<button type="button">New Game</button>
+			</div>
 		</div>
 	</body>
 </html>
