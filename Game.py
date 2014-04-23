@@ -1,6 +1,6 @@
 import requests
 from pattern import web
-from Strategy import AbstractStrategy
+from strategy import AbstractStrategy
 from HTMLParser import HTMLParser
 import re
 
